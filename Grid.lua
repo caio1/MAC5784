@@ -6,6 +6,20 @@ local Cell = require("Cell")
 local gbOffsetX = display.contentCenterX - ( display.contentWidth * 0.5 ) 
 local gbOffsetY = display.contentCenterY - ( display.contentHeight * 0.5 )
 
+local function getActualCoordinates(grid, x, y)
+	actX = (x - 1) * grid.cellWidth + (grid.cellWidth * 0.5) --+ gbOffsetX
+	actY = (y - 1) * grid.cellHeight + (grid.cellHeight * 0.5) --+ gbOffsetY
+
+	return actX, actY
+end
+
+local function distance(x1, y1, x2, y2)
+	return math.sqrt(math.pow(x1 - x2, 2), math.pow(y1 - y2, 2))
+end
+
+local function getNeighbors(grid, x, y)
+
+end
 
 
 local function spawnPiece(grid, xPos, yPos, pieceType )
@@ -101,6 +115,7 @@ local function new(params)
 
 	grid.movePiece = movePiece
 	grid.spawnPiece = spawnPiece
+	grid.getActualCoordinates = getActualCoordinates
 
 	return grid
 end
