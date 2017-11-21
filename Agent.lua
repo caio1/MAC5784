@@ -1,60 +1,125 @@
 local Agent = {}
 
-local gbOffsetX = display.contentCenterX - ( display.contentWidth * 0.5 ) 
-local gbOffsetY = display.contentCenterY - ( display.contentHeight * 0.5 )
+local constants = require("constants")
 
-local function move(agent, grid)
-	
-	if xPos < 1 or xPos > grid.width or yPos < 1 or yPos > grid.height then
+
+local function compare(cell1, cell2, team)
+	if cell1 and cell2 then
+
+		local influence1 = cell1.influence[team]
+		local influence2 = cell2.influence[team]
+
+		return influence1 > influence2
+	else
 		return false
 	end
-	if grid[yPos][xPos] == nil then -- got an empty spot
-		--
-		-- get the screen x, y for where we are moving to
-		--
-		local x = (xPos - 1) * grid.cellWidth + (grid.cellWidth * 0.5) + gbOffsetX
-		local y = (yPos - 1) * grid.cellHeight + (grid.cellHeight * 0.5) + gbOffsetY
-		--
-		-- save the old grid x, y
-		--
-		local oldXPos = piece.xPos
-		local oldYPos = piece.yPos
-		--
-		-- Move the object in the table
-		--
-		grid[yPos][xPos] = piece
-		grid[yPos][xPos].xPos = xPos
-		grid[yPos][xPos].yPos = yPos
-		grid[oldYPos][oldXPos] = nil
-		--
-		-- Now move the physical graphic
-		--
-		transition.to(grid[yPos][xPos], { time = 500, x = x, y = y})
-		return true
+end
+
+
+-- adds a negative influence to the agent's 
+-- influence map
+local function addInfluence(cell, team, signal)
+
+	local y = cell.yPos
+	local x = cell.xPos
+
+	for i=-4, 4 do
+		for j=-4, 4 do
+			if grid[y + i] and grid[y + i][x + j] and not grid[y + i][x + j].isWall then
+				grid[y + i][x + j].influence[team] = 
+					grid[y + i][x + j].influence[team] - signal*constants.influenceMap[i + 5][j + 5]/1000
+			end
+		end
+	end
+end
+
+local function reachedObjective(agent)
+	return agent.cell.isObjective[agent.team]
+end
+
+local function move(agent)
+
+	local neighbors = agent.cell:getNeighbors()
+
+	table.sort(neighbors, function(cell1, cell2) 
+		return compare(cell1, cell2, agent.team) 
+	end)
+
+
+	for i, neighbor in ipairs(neighbors) do
+		if (neighbor.isEmpty or neighbor == agent.cell) and not neighbor.isWall then
+
+			agent.cell.isEmpty = true
+			neighbor.isEmpty = false
+
+			addInfluence(agent.cell, math.fmod(agent.team, 2) + 1, -1)
+
+			agent.xPos = neighbor.xPos
+			agent.yPos = neighbor.yPos
+
+			agent.cell = neighbor
+
+
+			local x, y = getPixelCoordinates(neighbor.xPos, neighbor.yPos)
+			-- agent.x, agent.y = getPixelCoordinates(neighbor.x, neighbor.y)
+			-- if reachedObjective(agent) then
+			-- 	removeInfluence(agent.cell, math.fmod(agent.team, 2) + 1)
+			-- 	grid[agent.yPos][agent.xPos].isEmpty = true
+			-- 	timer.cancel(agent.timer)
+			-- 	display.remove(agent)
+			-- 	agent = nil
+			-- end
+
+			transition.to(agent, { 
+				time = constants.transitionTime, 
+				x = x, 
+				y = y, 
+				onComplete = function ()
+					if reachedObjective(agent) then
+						agent.cell.isEmpty = true
+						timer.cancel(agent.timer)
+						display.remove(agent)
+						agent = nil
+					else
+						addInfluence(neighbor, math.fmod(agent.team, 2) + 1, 1)
+					end
+				end
+			})
+			break
+		end
 	end
 
 end
 
 
-local function init()
-	
+local function init(agent)
+	agent.timer = timer.performWithDelay(constants.movementInterval, function() 
+		agent:move()
+ 	end, -1)
 end
 
-function Agent:new(x, y, team, grid)
-	local agent = display.newImageRect( "cat" ..team.. ".png", grid.cellWidth, grid.cellHeight )
+function Agent:new(x, y, team)
+	local agent = display.newImageRect( "cat" ..team.. ".png", cellWidth, cellHeight )
 
 	agent.xPos = x
 	agent.yPos = y
+	agent.team = team
+
+
+	agent.cell = grid[agent.yPos][agent.xPos]
+	agent.cell.isEmpty = false
 	--
 
-	agent.x, agent.y = grid:getActualCoordinates(x, y)
+	agent.x, agent.y = getPixelCoordinates(x, y)
 
-	--agent.x = (x - 1) * grid.cellWidth + (grid.cellWidth * 0.5) + gbOffsetX
-	--agent.y = (y - 1) * grid.cellHeight + (grid.cellHeight * 0.5) + gbOffsetY
 
-	agent.objective = grid.objective
+	agent.objective = objectives[team]
+	--agent.objectiveNeighbors = grid[objectives[team].y][objectives[team].x]:getNeighbors()
 
 	agent.init = init
+	agent.move = function() move(agent, grid) end
+
+	addInfluence(agent.cell, math.fmod(agent.team, 2) + 1, 1)
 
 	return agent
 end

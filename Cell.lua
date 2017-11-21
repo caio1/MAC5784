@@ -1,9 +1,80 @@
+local constants = require("constants")
 
-function new(x, y, team)
-	local cell = {}
+-- Returns a table containing for each objective, 
+-- the distance from this cell to that objective
+local function distanceToObjectives(cell)
+	local distToObjectives = {}
 
-	cell.influence = 0
+	for i, obj in ipairs(objectives) do
+		table.insert(distToObjectives, distance(cell.xPos, cell.yPos, obj.x, obj.y))
+	end
+
+	return distToObjectives
+end
+
+-- Returns the cell and its neighbors
+
+local function getNeighbors(cell)
+	local x = cell.xPos
+	local y = cell.yPos
+
+	local neighbors = {}
+	for i=-1, 1 do
+		for j=-1, 1 do
+			if grid[y + i] and grid[y + i][x + j] and not grid[y + i][x + j]. isWall then
+				table.insert(neighbors, grid[y + i][x + j])
+			end
+		end
+	end
+
+	return neighbors
+
+end
+
+---------------------------------------
+local function drawRect(cell, x, y, isWall)
+	local actX, actY = getPixelCoordinates(x, y)
+
+	local rect = display.newRect(actX, actY, cellWidth, cellHeight )
+	rect.strokeWidth = 1
+	rect:setStrokeColor( 0, 0, 0, 0.1 )
+	rect:setFillColor(1, 1, 1, 0)
+
+	if isWall then
+		rect:setFillColor( 0.5 )	
+	end
+	cell:insert(rect)
+	cell.rect = rect
+end
+
+local function deleteRect(cell)
+	display.remove(cell.rect)
+	cell.rect = nil
+end
+
+local function new(x, y, isWall)
+	local cell = display.newGroup()
+
+	cell.xPos = x
+	cell.yPos = y
+	cell.isWall = isWall
+
+	drawRect(cell, x, y, isWall)
 	cell.isEmpty = true
+
+	cell.distToObjectives = distanceToObjectives(cell)
+
+	cell.isObjective = {false, false}
+	
+
+	if isWall then
+		cell.influence = {-1, -1}
+	else
+		cell.influence = {1/math.log(cell.distToObjectives[1] + 1), 1/math.log(cell.distToObjectives[2] + 1)}
+	end
+
+	cell.getNeighbors = getNeighbors
+	cell.deleteRect = deleteRect
 
 	return cell
 end
