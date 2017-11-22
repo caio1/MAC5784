@@ -3,8 +3,8 @@ local constants = {}
 --time
 
 constants.spawnInterval    = 200
-constants.movementInterval = 150
-constants.transitionTime   = 80
+constants.movementInterval = 300
+constants.transitionTime   = 120
 
 constants.cellWidth  = 25
 constants.cellHeight = 25
@@ -37,8 +37,21 @@ constants.influenceMap = {
 	{0, 0, 0,  0,  0,  0, 0, 0, 0},
 }
 
-constants.agentPos = {
-	{x = 12, y = 12}
+-- Defense
+constants.defAgents = {
+	{x = 3, y = 5},
+	{x = 3, y = 23},
+	{x = 6, y = 10},
+	{x = 6, y = 18},
+	{x = 9, y = 14},
+}
+-- Attack
+constants.atkAgents ={
+	-- {x = 18, y = 5},
+	-- {x = 18, y = 10},
+	-- {x = 18, y = 14},
+	-- {x = 18, y = 18},
+	{x = 18, y = 23},
 }
 
 

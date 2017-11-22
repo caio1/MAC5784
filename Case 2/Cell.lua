@@ -4,6 +4,11 @@ local function distanceToObjectives(cell)
 	local distToObjectives = {}
 
 	for i, obj in ipairs(objectives) do
+		--local dist = {}
+		--for _,neighbor in ipairs(grid[obj.y][obj.x]:getNeighbors()) do
+		-- 	dist.insert(distance(cell.xPos, cell.yPos, obj.x, obj.y))
+		-- end
+		-- table.insert(distToObjectives, math.min(unpack(dist)))
 		table.insert(distToObjectives, distance(cell.xPos, cell.yPos, obj.x, obj.y))
 	end
 
@@ -64,17 +69,25 @@ local function new(x, y, cellType)
 
 	cell.distToObjectives = distanceToObjectives(cell)
 
-	cell.isObjective = {false, false}
+	cell.isObjective = {}
+
+	cell.isObjective["attack"]  = {false, false}
+	cell.isObjective["defense"] = {false, false}
+	cell.isObjective["return"]  = {false, false}
 	
 
 	if cell.isWall then
 		cell.influenceAtk = {-1, -1}
-		cell.influenceDef = {-1, -1}
+		cell.influenceDef = {0, 0}
 		cell.influenceRet = {-1, -1}
 	else
-		cell.influenceDef = {0, 0}
-		cell.influenceRet = {1/math.log(cell.distToObjectives[2] + 1), 1/math.log(cell.distToObjectives[1] + 1)}
-		cell.influenceAtk = {1/math.log(cell.distToObjectives[1] + 1), 1/math.log(cell.distToObjectives[2] + 1)}
+		if cellType == 2 then
+			cell.influenceDef = {-1000, -1000}
+		else
+			cell.influenceDef = {0, 0}
+		end
+		cell.influenceRet = {10/math.log(cell.distToObjectives[2] + 1.5), 10/math.log(cell.distToObjectives[1] + 1.5)}
+		cell.influenceAtk = {10/math.log(cell.distToObjectives[1] + 1.5), 10/math.log(cell.distToObjectives[2] + 1.5)}
 	end
 
 	cell.getNeighbors = getNeighbors

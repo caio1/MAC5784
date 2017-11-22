@@ -60,9 +60,9 @@ local function setup()
 	-- Add objective marks to cells --
 	for i=1,2 do
 		local objective = grid[objectives[i].y][objectives[i].x]
-
 		for _,cell in ipairs(grid[objectives[i].y][objectives[i].x]:getNeighbors()) do
-			cell.isObjective[i] = true
+			cell.isObjective["attack"][i] = true
+			cell.isObjective["return"][math.fmod(i, 2) + 1] = true
 			cell.rect:setFillColor(1, 0, 0, 0.5)
 		end
 		objective.rect:setFillColor(1, 0, 0, 1)
@@ -72,17 +72,28 @@ end
 
 local function start()
     -- create 50 agents --
-	if mainTimer then
-		timer.cancel(mainTimer)
-		mainTimer = nil
-	end
+	-- if mainTimer then
+	-- 	timer.cancel(mainTimer)
+	-- 	mainTimer = nil
+	-- end
 	--mainTimer = timer.performWithDelay(constants.spawnInterval, function() 
-	for _,pos in ipairs(constants.agentPos) do
-		local agent = Agent:new(pos.x, pos.y, 1)
-		table.insert(agents, agent)
+	for _,pos in ipairs(constants.defAgents) do
+		local agent1 = Agent:new(pos.x, pos.y, 1, "defense")
+		table.insert(agents, agent1)		
+		local agent2 = Agent:new(gridWidth + 1 - pos.x, pos.y, 2, "defense")
+		table.insert(agents, agent2)
+	end	
+
+	for _,pos in ipairs(constants.atkAgents) do
+		local agent1 = Agent:new(pos.x, pos.y, 1, "attack")
+		table.insert(agents, agent1)		
+		local agent2 = Agent:new(gridWidth + 1 - pos.x, pos.y, 2, "attack")
+		table.insert(agents, agent2)
 	end
 
-	--agent:init() 
+	for _,agent in ipairs(agents) do
+		agent:init() 
+	end
 		-- local objective1 = shuffle(grid[objectives[2].y][objectives[2].x]:getNeighbors())
 		-- local objective2 = shuffle(grid[objectives[1].y][objectives[1].x]:getNeighbors())
 
