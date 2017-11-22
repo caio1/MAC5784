@@ -1,5 +1,3 @@
-local constants = require("constants")
-
 -- Returns a table containing for each objective, 
 -- the distance from this cell to that objective
 local function distanceToObjectives(cell)
@@ -32,7 +30,7 @@ local function getNeighbors(cell)
 end
 
 ---------------------------------------
-local function drawRect(cell, x, y, isWall)
+local function drawRect(cell, x, y, cellType)
 	local actX, actY = getPixelCoordinates(x, y)
 
 	local rect = display.newRect(actX, actY, cellWidth, cellHeight )
@@ -40,8 +38,10 @@ local function drawRect(cell, x, y, isWall)
 	rect:setStrokeColor( 0, 0, 0, 0.1 )
 	rect:setFillColor(1, 1, 1, 0)
 
-	if isWall then
-		rect:setFillColor( 0.5 )	
+	if cellType == 1 then
+		rect:setFillColor( 0.5 )
+	elseif cellType == 2 then
+		rect:setFillColor(0.5, 0, 0, 0.3)	
 	end
 	cell:insert(rect)
 	cell.rect = rect
@@ -52,14 +52,14 @@ local function deleteRect(cell)
 	cell.rect = nil
 end
 
-local function new(x, y, isWall)
+local function new(x, y, cellType)
 	local cell = display.newGroup()
 
 	cell.xPos = x
 	cell.yPos = y
-	cell.isWall = isWall
+	cell.isWall = cellType == 1
 
-	drawRect(cell, x, y, isWall)
+	drawRect(cell, x, y, cellType)
 	cell.isEmpty = true
 
 	cell.distToObjectives = distanceToObjectives(cell)
@@ -67,10 +67,14 @@ local function new(x, y, isWall)
 	cell.isObjective = {false, false}
 	
 
-	if isWall then
-		cell.influence = {-1, -1}
+	if cell.isWall then
+		cell.influenceAtk = {-1, -1}
+		cell.influenceDef = {-1, -1}
+		cell.influenceRet = {-1, -1}
 	else
-		cell.influence = {1/math.log(cell.distToObjectives[1] + 1), 1/math.log(cell.distToObjectives[2] + 1)}
+		cell.influenceDef = {0, 0}
+		cell.influenceRet = {1/math.log(cell.distToObjectives[2] + 1), 1/math.log(cell.distToObjectives[1] + 1)}
+		cell.influenceAtk = {1/math.log(cell.distToObjectives[1] + 1), 1/math.log(cell.distToObjectives[2] + 1)}
 	end
 
 	cell.getNeighbors = getNeighbors

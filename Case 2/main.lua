@@ -3,10 +3,10 @@
 -- main.lua
 --
 -----------------------------------------------------------------------------------------
-local Grid = require("Grid")
-local Agent = require("Agent")
+local Grid      = require("Grid")
+local Agent     = require("Agent")
 local constants = require("constants")
-local widget = require( "widget" )
+local widget    = require( "widget" )
 
 
 cellWidth  = constants.cellWidth
@@ -18,9 +18,7 @@ objectives = constants.objectives
 
 local agents = {}
 local mainTimer 
-
-local influencemap1 = {}
-local influencemap2 = {}
+local resetButton
 
 ----------------------
 -- HELPER FUNCTIONS --
@@ -50,9 +48,9 @@ function shuffle(table)
   return table
 end
 
-----------
--- MAIN --
-----------
+----------------
+----- MAIN -----
+----------------
 
 local function setup()
 	-- Create Grid --
@@ -78,31 +76,34 @@ local function start()
 		timer.cancel(mainTimer)
 		mainTimer = nil
 	end
-	mainTimer = timer.performWithDelay(constants.spawnInterval, function() 
+	--mainTimer = timer.performWithDelay(constants.spawnInterval, function() 
+	for _,pos in ipairs(constants.agentPos) do
+		local agent = Agent:new(pos.x, pos.y, 1)
+		table.insert(agents, agent)
+	end
 
+	--agent:init() 
+		-- local objective1 = shuffle(grid[objectives[2].y][objectives[2].x]:getNeighbors())
+		-- local objective2 = shuffle(grid[objectives[1].y][objectives[1].x]:getNeighbors())
 
-		local objective1 = shuffle(grid[objectives[2].y][objectives[2].x]:getNeighbors())
-		local objective2 = shuffle(grid[objectives[1].y][objectives[1].x]:getNeighbors())
+		-- for i,cell in ipairs(objective1) do
+		-- 	if cell.isEmpty and not cell.isWall then
+		-- 		local agent = Agent:new(cell.xPos, cell.yPos, 1)
+		-- 		agent:init()
+		-- 		table.insert(agents, agent)
+		-- 		break
+		-- 	end
+		-- end
 
-		for i,cell in ipairs(objective1) do
-			if cell.isEmpty and not cell.isWall then
-				local agent = Agent:new(cell.xPos, cell.yPos, 1)
-				agent:init()
-				table.insert(agents, agent)
-				break
-			end
-		end
-
-		for i,cell in ipairs(objective2) do
-			if cell.isEmpty then
-				local agent = Agent:new(cell.xPos, cell.yPos, 2)
-				agent:init()
-				table.insert(agents, agent)
-				break
-			end
-		end
-
-	 end, 70)
+		-- for i,cell in ipairs(objective2) do
+		-- 	if cell.isEmpty then
+		-- 		local agent = Agent:new(cell.xPos, cell.yPos, 2)
+		-- 		agent:init()
+		-- 		table.insert(agents, agent)
+		-- 		break
+		-- 	end
+		-- end
+	 --end, 70)
 
 end
 
@@ -119,6 +120,7 @@ local function reset( event )
 				agent = nil	
         	end 
         end
+        agents = {}
         --reset cells
 	    for i = 1, gridHeight do
 			for j = 1, gridWidth do
@@ -130,7 +132,6 @@ local function reset( event )
 		grid = nil
 		setup()
         start()
-
     end
 
 end
@@ -142,7 +143,7 @@ background.x = display.contentCenterX
 background.y = display.contentCenterY
 
 -- Create the widget
-local button1 = widget.newButton(
+local resetButton = widget.newButton(
     {
 		label        = "Reset\nSimulation",
 		labelAlign   = "center",
@@ -160,8 +161,8 @@ local button1 = widget.newButton(
 		onEvent      = reset,
     }
 )
-button1.x = display.contentWidth - button1.width*0.5 - 5
-button1.y = 80
+resetButton.x = display.contentWidth - resetButton.width*0.5 - 5
+resetButton.y = display.contentHeight - resetButton.height/2 - 20
 
 
 setup()
