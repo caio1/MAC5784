@@ -41,7 +41,7 @@ local function addInfluence(agent, cell, team, signal)
 		for j=-4, 4 do
 			if grid[y + i] and grid[y + i][x + j] and not grid[y + i][x + j].isWall then
 				local cell = grid[y + i][x + j]
-				local influence = signal*constants.influenceMap[i + 5][j + 5]/1000
+				local influence = signal*constants.influenceMap[i + 5][j + 5]/100
 				
 				cell.influenceAtk[team] = cell.influenceAtk[team] - influence
 				cell.influenceRet[team] = cell.influenceRet[team] - influence
@@ -65,10 +65,18 @@ local function move(agent)
 
 
 	for i, neighbor in ipairs(neighbors) do
-		if (neighbor.isEmpty or neighbor == agent.cell) and not neighbor.isWall then
+		if not neighbor.isEmpty and neighbor.agentInCell.type == "attack" then
+			
+			if neighbor.agentInCell.team == math.fmod(agent.team, 2) + 1 then
+				neighbor.agentInCell.frozen = 3
+			end
+
+		elseif (neighbor.isEmpty or neighbor == agent.cell) and not neighbor.isWall then
 
 			agent.cell.isEmpty = true
+			agent.cell.agentInCell = nil
 			neighbor.isEmpty = false
+			neighbor.agentInCell = agent
 
 			agent:addInfluence(agent.cell, math.fmod(agent.team, 2) + 1, -1)
 
@@ -79,14 +87,6 @@ local function move(agent)
 
 
 			local x, y = getPixelCoordinates(neighbor.xPos, neighbor.yPos)
-			-- agent.x, agent.y = getPixelCoordinates(neighbor.x, neighbor.y)
-			-- if reachedObjective(agent) then
-			-- 	removeInfluence(agent.cell, math.fmod(agent.team, 2) + 1)
-			-- 	grid[agent.yPos][agent.xPos].isEmpty = true
-			-- 	timer.cancel(agent.timer)
-			-- 	display.remove(agent)
-			-- 	agent = nil
-			-- end
 
 			transition.to(agent, { 
 				time = constants.transitionTime, 
@@ -98,9 +98,11 @@ local function move(agent)
 							agent.type = "return"
 							agent.xScale = -1
 							agent:addInfluence(neighbor, math.fmod(agent.team, 2) + 1, 1)
+						else
+							timer.cancel(agent.timer)
 						end
+
 						-- agent.cell.isEmpty = true
-						-- timer.cancel(agent.timer)
 						-- display.remove(agent)
 						-- agent = nil
 					else
@@ -117,7 +119,9 @@ end
 
 local function init(agent)
 	agent.timer = timer.performWithDelay(constants.movementInterval, function() 
-		agent:move()
+		if not (agent.frozen > 0) then
+			agent:move()
+		end
  	end, -1)
 end
 
@@ -133,12 +137,14 @@ function Agent:new(x, y, team, agentType)
 
 	agent.cell = grid[agent.yPos][agent.xPos]
 	agent.cell.isEmpty = false
+	agent.cell.agentInCell = agent
 	--
 
 	agent.x, agent.y = getPixelCoordinates(x, y)
 
 
 	agent.objective = objectives[team]
+	agent.frozen = 0
 
 	agent.init = init
 	agent.move = function() move(agent, grid) end

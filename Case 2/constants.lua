@@ -47,10 +47,10 @@ constants.defAgents = {
 }
 -- Attack
 constants.atkAgents ={
-	-- {x = 18, y = 5},
-	-- {x = 18, y = 10},
-	-- {x = 18, y = 14},
-	-- {x = 18, y = 18},
+	{x = 18, y = 5},
+	{x = 18, y = 10},
+	{x = 18, y = 14},
+	{x = 18, y = 18},
 	{x = 18, y = 23},
 }
 

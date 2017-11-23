@@ -46,7 +46,7 @@ local function drawRect(cell, x, y, cellType)
 	if cellType == 1 then
 		rect:setFillColor( 0.5 )
 	elseif cellType == 2 then
-		rect:setFillColor(0.5, 0, 0, 0.3)	
+		rect:setFillColor(0.5, 0, 0.5, 0.2)	
 	end
 	cell:insert(rect)
 	cell.rect = rect
@@ -66,6 +66,7 @@ local function new(x, y, cellType)
 
 	drawRect(cell, x, y, cellType)
 	cell.isEmpty = true
+	cell.agentInCell = nil
 
 	cell.distToObjectives = distanceToObjectives(cell)
 
