@@ -1,14 +1,9 @@
--- Returns a table containing for each objective, 
+-- Returns a table containing for each objective,
 -- the distance from this cell to that objective
 local function distanceToObjectives(cell)
 	local distToObjectives = {}
 
 	for i, obj in ipairs(objectives) do
-		--local dist = {}
-		--for _,neighbor in ipairs(grid[obj.y][obj.x]:getNeighbors()) do
-		-- 	dist.insert(distance(cell.xPos, cell.yPos, obj.x, obj.y))
-		-- end
-		-- table.insert(distToObjectives, math.min(unpack(dist)))
 		table.insert(distToObjectives, distance(cell.xPos, cell.yPos, obj.x, obj.y))
 	end
 
@@ -23,7 +18,7 @@ local function getNeighbors(cell, size)
 
 	if not size then
 		size = 1
-	end 
+	end
 
 	local neighbors = {}
 	for i=-size, size do
@@ -50,7 +45,7 @@ local function drawRect(cell, x, y, cellType)
 	if cellType == 1 then
 		rect:setFillColor( 0.5 )
 	elseif cellType == 2 then
-		rect:setFillColor(0.5, 0, 0.5, 0.2)	
+		rect:setFillColor(0.5, 0, 0.5, 0.2)
 	end
 	cell:insert(rect)
 	cell.rect = rect
@@ -79,7 +74,7 @@ local function new(x, y, cellType)
 	cell.isObjective["attack"]  = {false, false}
 	cell.isObjective["defense"] = {false, false}
 	cell.isObjective["return"]  = {false, false}
-	
+
 
 	if cell.isWall then
 		cell.influenceAtk = {-1, -1}

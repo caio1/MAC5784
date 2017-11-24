@@ -2,7 +2,7 @@ local Cell      = require("Cell")
 local maps      = require("maps")
 local constants = require("constants")
 
-local function new(params)
+local function new()
 	local grid = {}
 
 	local gridHeight = constants.gridHeight

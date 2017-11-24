@@ -17,7 +17,7 @@ gridHeight = constants.gridHeight
 objectives = constants.objectives
 
 local agents = {}
-local mainTimer 
+local mainTimer
 local resetButton
 
 ----------------------
@@ -60,7 +60,7 @@ local function setup()
 	-- Add objective marks to cells --
 	for team = 1, 2 do
 		local objective = grid[objectives[team].y][objectives[team].x]
-		for _,cell in ipairs(grid[objectives[team].y][objectives[team].x]:getNeighbors(2)) do
+		for _,cell in ipairs(grid[objectives[team].y][objectives[team].x]:getNeighbors(3)) do
 			cell.isObjective["attack"][team] = true
 			cell.isObjective["return"][math.fmod(team, 2) + 1] = true
 			cell.influenceDef[math.fmod(team, 2) + 1] = -1000
@@ -72,53 +72,28 @@ local function setup()
 end
 
 local function start()
-	-- if mainTimer then
-	-- 	timer.cancel(mainTimer)
-	-- 	mainTimer = nil
-	-- end
-	--mainTimer = timer.performWithDelay(constants.spawnInterval, function() 
+
 	for _,pos in ipairs(constants.defAgents) do
 		local agent1 = Agent:new(pos.x, pos.y, 1, "defense")
-		table.insert(agents, agent1)		
+		table.insert(agents, agent1)
 		local agent2 = Agent:new(gridWidth + 1 - pos.x, pos.y, 2, "defense")
 		table.insert(agents, agent2)
-	end	
+	end
 
 	for _,pos in ipairs(constants.atkAgents) do
 		local agent1 = Agent:new(pos.x, pos.y, 1, "attack")
-		table.insert(agents, agent1)		
+		table.insert(agents, agent1)
 		local agent2 = Agent:new(gridWidth + 1 - pos.x, pos.y, 2, "attack")
 		table.insert(agents, agent2)
 	end
 
 	for _,agent in ipairs(agents) do
-		agent:init() 
+		agent:init()
 	end
-		-- local objective1 = shuffle(grid[objectives[2].y][objectives[2].x]:getNeighbors())
-		-- local objective2 = shuffle(grid[objectives[1].y][objectives[1].x]:getNeighbors())
-
-		-- for i,cell in ipairs(objective1) do
-		-- 	if cell.isEmpty and not cell.isWall then
-		-- 		local agent = Agent:new(cell.xPos, cell.yPos, 1)
-		-- 		agent:init()
-		-- 		table.insert(agents, agent)
-		-- 		break
-		-- 	end
-		-- end
-
-		-- for i,cell in ipairs(objective2) do
-		-- 	if cell.isEmpty then
-		-- 		local agent = Agent:new(cell.xPos, cell.yPos, 2)
-		-- 		agent:init()
-		-- 		table.insert(agents, agent)
-		-- 		break
-		-- 	end
-		-- end
-	 --end, 70)
 
 end
 
- 
+
 -- Function to handle button events
 local function reset( event )
     if ( "ended" == event.phase ) then
@@ -128,8 +103,8 @@ local function reset( event )
         	if agent then
 				timer.cancel(agent.timer)
 				display.remove(agent)
-				agent = nil	
-        	end 
+				agent = nil
+        	end
         end
         agents = {}
         --reset cells
@@ -146,7 +121,7 @@ local function reset( event )
     end
 
 end
- 
+
 -- Draw background and button and start simulation
 
 local background = display.newImageRect("grass.png", display.contentWidth, display.contentHeight)
