@@ -58,11 +58,12 @@ local function setup()
 	grid = Grid.new(gridParams)
 
 	-- Add objective marks to cells --
-	for i=1,2 do
-		local objective = grid[objectives[i].y][objectives[i].x]
-		for _,cell in ipairs(grid[objectives[i].y][objectives[i].x]:getNeighbors()) do
-			cell.isObjective["attack"][i] = true
-			cell.isObjective["return"][math.fmod(i, 2) + 1] = true
+	for team = 1, 2 do
+		local objective = grid[objectives[team].y][objectives[team].x]
+		for _,cell in ipairs(grid[objectives[team].y][objectives[team].x]:getNeighbors(2)) do
+			cell.isObjective["attack"][team] = true
+			cell.isObjective["return"][math.fmod(team, 2) + 1] = true
+			cell.influenceDef[math.fmod(team, 2) + 1] = -1000
 			cell.rect:setFillColor(1, 0, 0, 0.5)
 		end
 		objective.rect:setFillColor(1, 0, 0, 1)
@@ -71,7 +72,6 @@ local function setup()
 end
 
 local function start()
-    -- create 50 agents --
 	-- if mainTimer then
 	-- 	timer.cancel(mainTimer)
 	-- 	mainTimer = nil

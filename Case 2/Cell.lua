@@ -17,14 +17,18 @@ end
 
 -- Returns the cell and its neighbors
 
-local function getNeighbors(cell)
+local function getNeighbors(cell, size)
 	local x = cell.xPos
 	local y = cell.yPos
 
+	if not size then
+		size = 1
+	end 
+
 	local neighbors = {}
-	for i=-1, 1 do
-		for j=-1, 1 do
-			if grid[y + i] and grid[y + i][x + j] and not grid[y + i][x + j]. isWall then
+	for i=-size, size do
+		for j=-size, size do
+			if grid[y + i] and grid[y + i][x + j] and not grid[y + i][x + j].isWall then
 				table.insert(neighbors, grid[y + i][x + j])
 			end
 		end
@@ -87,7 +91,7 @@ local function new(x, y, cellType)
 		else
 			cell.influenceDef = {0, 0}
 		end
-		cell.influenceRet = {10/math.log(cell.distToObjectives[2] + 1.5), 10/math.log(cell.distToObjectives[1] + 1.5)}
+		cell.influenceRet = {30/math.log(cell.distToObjectives[2] + 1.5), 30/math.log(cell.distToObjectives[1] + 1.5)}
 		cell.influenceAtk = {10/math.log(cell.distToObjectives[1] + 1.5), 10/math.log(cell.distToObjectives[2] + 1.5)}
 	end
 
