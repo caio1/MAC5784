@@ -26,7 +26,7 @@ local mainTimer
 -- calculates distance between two points
 function distance(x1, y1, x2, y2)
 	local dist = math.ceil(math.sqrt(math.pow(x1 - x2, 2) + math.pow(y1 - y2, 2)))
-	return dist--math.min(math.abs(x1 - x2), math.abs(y1 - y2))
+	return dist
 end
 
 -- converts grid coordinates to pixel coordinates
@@ -137,13 +137,12 @@ local background = display.newImageRect("grass.png", display.contentWidth, displ
 background.x = display.contentCenterX
 background.y = display.contentCenterY
 
--- Create the widget
+-- Create the reset button
 local button1 = widget.newButton(
     {
 		label        = "Reset\nSimulation",
 		labelAlign   = "center",
 		emboss       = false,
-		-- Properties for a rounded rectangle button
 		shape        = "roundedRect",
 		width        = 130,
 		fontSize     = 28,

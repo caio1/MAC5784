@@ -61,6 +61,8 @@ local function move(agent)
 
 
 			local x, y = getPixelCoordinates(neighbor.xPos, neighbor.yPos)
+
+			-- Move without transition --
 			-- agent.x, agent.y = getPixelCoordinates(neighbor.x, neighbor.y)
 			-- if reachedObjective(agent) then
 			-- 	removeInfluence(agent.cell, math.fmod(agent.team, 2) + 1)
@@ -108,13 +110,11 @@ function Agent:new(x, y, team)
 
 	agent.cell = grid[agent.yPos][agent.xPos]
 	agent.cell.isEmpty = false
-	--
 
 	agent.x, agent.y = getPixelCoordinates(x, y)
 
 
 	agent.objective = objectives[team]
-	--agent.objectiveNeighbors = grid[objectives[team].y][objectives[team].x]:getNeighbors()
 
 	agent.init = init
 	agent.move = function() move(agent, grid) end

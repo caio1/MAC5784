@@ -27,7 +27,7 @@ local resetButton
 -- calculates distance between two points
 function distance(x1, y1, x2, y2)
 	local dist = math.ceil(math.sqrt(math.pow(x1 - x2, 2) + math.pow(y1 - y2, 2)))
-	return dist--math.min(math.abs(x1 - x2), math.abs(y1 - y2))
+	return dist
 end
 
 -- converts grid coordinates to pixel coordinates
@@ -69,6 +69,8 @@ local function setup()
 		objective.rect:setFillColor(1, 0, 0, 1)
 	end
 
+	atkAgents = {0, 0}
+
 end
 
 local function start()
@@ -85,12 +87,26 @@ local function start()
 		table.insert(agents, agent1)
 		local agent2 = Agent:new(gridWidth + 1 - pos.x, pos.y, 2, "attack")
 		table.insert(agents, agent2)
+		atkAgents[1] = atkAgents[1] + 1
+		atkAgents[2] = atkAgents[2] + 1
 	end
 
 	for _,agent in ipairs(agents) do
 		agent:init()
 	end
 
+end
+
+function endSimulation(team)
+	for _,agent in ipairs(agents) do
+		if agent then
+			timer.cancel(agent.timer)
+			-- display.remove(agent)
+			-- agent = nil
+		end
+	end
+	-- agents = {}
+	native.showAlert( "Fim da simulação", "Time "..team.." é o vencedor!")
 end
 
 

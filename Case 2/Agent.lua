@@ -130,6 +130,10 @@ local function move(agent)
 						else
 							agent.cell.isEmpty = true
 							agent.cell.agentInCell = nil
+							atkAgents[agent.team] = atkAgents[agent.team] - 1
+							if atkAgents[agent.team] == 0 then
+								endSimulation(agent.team)
+							end
 							timer.cancel(agent.timer)
 							display.remove(agent)
 							agent = nil

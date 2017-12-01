@@ -29,7 +29,7 @@ constants.objectives = {
 	},
 }
 
--- influence map for one agent --
+-- this is the influence map for one agent's neighbors --
 constants.influenceMap = {
 	{ 0,  0,  0,  1,  2,  3,  2,  1,  0,  0,  0},
 

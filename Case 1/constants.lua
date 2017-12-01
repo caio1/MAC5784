@@ -25,6 +25,8 @@ constants.objectives = {
 }
 
 -- influence map for one agent --
+-- more influence in front of and behind the agent 
+-- than on top and bottom --
 constants.influenceMap = {
 	{0, 0, 0,  0,  0,  0, 0, 0, 0},
 	{0, 0, 0,  0,  0,  0, 0, 0, 0},
